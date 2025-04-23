@@ -7,6 +7,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()  // מאפשר לכל המקורות
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
 // טוען את מחרוזת החיבור ממערכת הסביבה
 var connectionString = Environment.GetEnvironmentVariable("ToDoDb") ?? 
                        builder.Configuration.GetConnectionString("ToDoDb");
@@ -15,6 +25,8 @@ builder.Services.AddDbContext<ToDoDbContext>(opt =>
     opt.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
